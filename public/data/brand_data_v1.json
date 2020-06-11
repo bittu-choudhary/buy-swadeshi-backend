@@ -1,0 +1,45 @@
+{
+  "version" : 1,
+  "categories" : {
+    "category_1" : {
+      "name" : "category_1",
+      "id" : "category_1"
+    },
+    "category_2" : {
+      "name" : "category_2",
+      "id" : "category_2"
+    },
+    "category_3" : {
+      "name" : "category_3",
+      "id" : "category_3"
+    }
+  },
+  "companies" : {
+    "company_1" : {
+      "name" : "company_1",
+      "id" : "company_1"
+    },
+    "company_2" : {
+      "name" : "company_2",
+      "id" : "company_2"
+    },
+    "company_3" : {
+      "name" : "company_3",
+      "id" : "company_3"
+    }
+  },
+  "products" : {
+    "product_1" : {
+      "name" : "product_1",
+      "id" : "product_1"
+    },
+    "product_2" : {
+      "name" : "product_2",
+      "id" : "product_2"
+    },
+    "product_3" : {
+      "name" : "product_3",
+      "id" : "product_3"
+    }
+  }
+}

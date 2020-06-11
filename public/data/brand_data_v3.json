@@ -1,0 +1,33 @@
+{
+  "version" : 3,
+  "categories" : {
+    "category_2" : {
+      "name" : "category_22",
+      "id" : "category_22"
+    },
+    "category_3" : {
+      "name" : "category_31",
+      "id" : "category_31"
+    }
+  },
+  "companies" : {
+    "company_2" : {
+      "name" : "company_22",
+      "id" : "company_22"
+    },
+    "company_3" : {
+      "name" : "company_31",
+      "id" : "company_31"
+    }
+  },
+  "products" : {
+    "product_2" : {
+      "name" : "product_22",
+      "id" : "product_22"
+    },
+    "product_3" : {
+      "name" : "product_31",
+      "id" : "product_31"
+    }
+  }
+}

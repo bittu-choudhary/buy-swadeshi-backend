@@ -37,6 +37,7 @@ class BrandController < ApplicationController
         category_products.each do |key, value|
           next if (key == pid || !value["isIndian"])
           product_obj["alt_products"][key] = value
+          product_obj["alt_products"][key]["company"] = @data["products"][key]["company"]
           break if product_obj["alt_products"].length == 10
         end
       end
@@ -50,12 +51,13 @@ class BrandController < ApplicationController
     cid = params["cid"]
     company_obj = @data["companies"][cid]
     company_obj["alt_companies"] = {}
-    company_obj["categories"].each do |key, value|
-      if value["isParent"] && company_obj["alt_companies"].length < 10
-        category_products = @data["categories"][key]["companies"]
-        category_products.each do |key, value|
-          next if (key == cid || !value["isIndian"])
-          company_obj["alt_companies"][key] = value
+    company_obj["categories"].each do |cat_key, cat_value|
+      if cat_value["isParent"] && company_obj["alt_companies"].length < 10
+        category_companies = @data["categories"][cat_key]["companies"]
+        category_companies.each do |com_key, com_value|
+          next if (com_key == cid || !com_value["isIndian"])
+          company_obj["alt_companies"][com_key] = com_value
+          company_obj["alt_companies"][com_key]["parent_category"] = cat_key
           break if company_obj["alt_companies"].length == 10
         end
       end
@@ -65,14 +67,48 @@ class BrandController < ApplicationController
 
   def category
     cat_id = params["catid"]
-    render :json => @data["categories"][cat_id]
+    cid = params["cid"] == "undefined" ? false : params["cid"]
+    is_indian = params["isIndian"] == "undefined" ? false : true
+    allc = params["allc"] == "undefined" ? false : true
+    category_obj = @data["categories"][cat_id]
+    products = []
+    if cid
+      @data["companies"][cid]["products"].each do |key, value|
+        next unless @data["products"][key]["categories"][cat_id]
+        products << value
+      end
+    else
+      if is_indian
+        if allc
+          category_obj["companies"].each do |key, value|
+            next unless value["isIndian"]
+            products << value
+          end
+        else
+          category_obj["products"].each do |key, value|
+            next unless value["isIndian"]
+            products << value
+          end
+        end
+      elsif allc
+        category_obj["companies"].each do |key, value|
+          products << value
+        end
+      else
+        category_obj["products"].each do |key, value|
+          products << value
+        end
+      end
+    end
+    category_obj["products"] = products
+    render :json => category_obj
   end
   
 
   private
 
   def load_data
-    file = File.open "#{Rails.root}/public/data/brand_data_v1.json"
+    file = File.open "#{Rails.root}/public/data/brand_data_v0.json"
     @data = JSON.load file
     file.close
   end

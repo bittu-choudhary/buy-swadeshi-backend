@@ -4,5 +4,6 @@ Rails.application.routes.draw do
   get 'product', to: 'brand#product'
   get 'company', to: 'brand#company'
   get 'category', to: 'brand#category'
+  get 'indexed_data', to: 'brand#indexed_data'
 
 end

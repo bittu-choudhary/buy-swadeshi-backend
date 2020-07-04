@@ -46,7 +46,7 @@ class BrandController < ApplicationController
     render :json => product_obj
 
   end
-  
+
   def company
     cid = params["cid"]
     company_obj = @data["companies"][cid]
@@ -103,7 +103,14 @@ class BrandController < ApplicationController
     category_obj["products"] = products
     render :json => category_obj
   end
-  
+
+  def indexed_data
+    file = File.open "#{Rails.root}/public/data/indexed_data.json"
+    indexed_data = JSON.load file
+    file.close
+    render :json => indexed_data
+  end
+
 
   private
 
@@ -112,7 +119,7 @@ class BrandController < ApplicationController
     @data = JSON.load file
     file.close
   end
-  
-  
+
+
 
 end

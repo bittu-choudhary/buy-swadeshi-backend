@@ -1,4 +1,5 @@
 class BrandController < ApplicationController
+  before_action :load_data, only: [:product, :company, :category]
 
   def data
     unless params["version"]
@@ -24,6 +25,58 @@ class BrandController < ApplicationController
     end
     render :json => updated_data
   end
+
+  def product
+    pid = params["pid"]
+    p pid
+    product_obj = @data["products"][pid]
+    product_obj["alt_products"] = {}
+    product_obj["categories"].each do |key, value|
+      if value["isParent"] && product_obj["alt_products"].length < 10
+        category_products = @data["categories"][key]["products"]
+        category_products.each do |key, value|
+          next if (key == pid || !value["isIndian"])
+          product_obj["alt_products"][key] = value
+          break if product_obj["alt_products"].length == 10
+        end
+      end
+    end
+    p product_obj["alt_products"].length
+    render :json => product_obj
+
+  end
+  
+  def company
+    cid = params["cid"]
+    company_obj = @data["companies"][cid]
+    company_obj["alt_companies"] = {}
+    company_obj["categories"].each do |key, value|
+      if value["isParent"] && company_obj["alt_companies"].length < 10
+        category_products = @data["categories"][key]["companies"]
+        category_products.each do |key, value|
+          next if (key == cid || !value["isIndian"])
+          company_obj["alt_companies"][key] = value
+          break if company_obj["alt_companies"].length == 10
+        end
+      end
+    end
+    render :json => company_obj
+  end
+
+  def category
+    cat_id = params["catid"]
+    render :json => @data["categories"][cat_id]
+  end
+  
+
+  private
+
+  def load_data
+    file = File.open "#{Rails.root}/public/data/brand_data_v1.json"
+    @data = JSON.load file
+    file.close
+  end
+  
   
 
 end

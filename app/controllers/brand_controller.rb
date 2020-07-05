@@ -1,5 +1,5 @@
 class BrandController < ApplicationController
-  before_action :load_data, only: [:product, :company, :category]
+  before_action :load_data, only: [:product, :company, :category, :staging]
 
   def data
     unless params["version"]
@@ -24,6 +24,10 @@ class BrandController < ApplicationController
       updated_data["companies"] = updated_data["companies"].merge(data["companies"])
     end
     render :json => updated_data
+  end
+
+  def staging
+    render :json => @data
   end
 
   def product

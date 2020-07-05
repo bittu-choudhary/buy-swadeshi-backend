@@ -5,5 +5,5 @@ Rails.application.routes.draw do
   get 'company', to: 'brand#company'
   get 'category', to: 'brand#category'
   get 'indexed_data', to: 'brand#indexed_data'
-
+  get 'staging', to: 'brand#staging'
 end

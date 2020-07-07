@@ -1,5 +1,6 @@
 class BrandController < ApplicationController
-  before_action :load_data, only: [:product, :company, :category, :staging]
+  # before_action :load_data, only: [:product, :company, :category, :staging]
+  require 'yajl'
 
   def data
     unless params["version"]
@@ -14,9 +15,9 @@ class BrandController < ApplicationController
     updated_data["products"] = {}
     updated_data["companies"] = {}
     Dir["#{Rails.root}/public/data/*.json"].sort.each do |temp_file|
-      file = File.open temp_file
-      data = JSON.load file
-      file.close
+      file = File.read temp_file
+      parser = Yajl::Parser.new
+      data = parser.parse(file)
       next if data["version"] <= user_version
       updated_data["version"] = data["version"]
       updated_data["categories"] = updated_data["categories"].merge(data["categories"])
@@ -27,21 +28,27 @@ class BrandController < ApplicationController
   end
 
   def staging
-    render :json => @data
+    file = File.read "#{Rails.root}/public/data/brand_data_v0.json"
+    parser = Yajl::Parser.new
+    data = parser.parse(file)
+    render :json => data
   end
 
   def product
     pid = params["pid"]
     p pid
-    product_obj = @data["products"][pid]
+    file = File.read "#{Rails.root}/public/data/brand_data_v0.json"
+    parser = Yajl::Parser.new
+    data = parser.parse(file)
+    product_obj = data["products"][pid]
     product_obj["alt_products"] = {}
     product_obj["categories"].each do |key, value|
       if value["isParent"] && product_obj["alt_products"].length < 10
-        category_products = @data["categories"][key]["products"]
+        category_products = data["categories"][key]["products"]
         category_products.each do |key, value|
           next if (key == pid || !value["isIndian"])
           product_obj["alt_products"][key] = value
-          product_obj["alt_products"][key]["company"] = @data["products"][key]["company"]
+          product_obj["alt_products"][key]["company"] = data["products"][key]["company"]
           break if product_obj["alt_products"].length == 10
         end
       end
@@ -52,12 +59,15 @@ class BrandController < ApplicationController
   end
 
   def company
+    file = File.read "#{Rails.root}/public/data/brand_data_v0.json"
+    parser = Yajl::Parser.new
+    data = parser.parse(file)
     cid = params["cid"]
-    company_obj = @data["companies"][cid]
+    company_obj = data["companies"][cid]
     company_obj["alt_companies"] = {}
     company_obj["categories"].each do |cat_key, cat_value|
       if cat_value["isParent"] && company_obj["alt_companies"].length < 10
-        category_companies = @data["categories"][cat_key]["companies"]
+        category_companies = data["categories"][cat_key]["companies"]
         category_companies.each do |com_key, com_value|
           next if (com_key == cid || !com_value["isIndian"])
           company_obj["alt_companies"][com_key] = com_value
@@ -70,15 +80,18 @@ class BrandController < ApplicationController
   end
 
   def category
+    file = File.read "#{Rails.root}/public/data/brand_data_v0.json"
+    parser = Yajl::Parser.new
+    data = parser.parse(file)
     cat_id = params["catid"]
     cid = params["cid"] == "undefined" ? false : params["cid"]
     is_indian = params["isIndian"] == "undefined" ? false : true
     allc = params["allc"] == "undefined" ? false : true
-    category_obj = @data["categories"][cat_id]
+    category_obj = data["categories"][cat_id]
     products = []
     if cid
-      @data["companies"][cid]["products"].each do |key, value|
-        next unless @data["products"][key]["categories"][cat_id]
+      data["companies"][cid]["products"].each do |key, value|
+        next unless data["products"][key]["categories"][cat_id]
         products << value
       end
     else
@@ -109,9 +122,9 @@ class BrandController < ApplicationController
   end
 
   def indexed_data
-    file = File.open "#{Rails.root}/public/data/indexed_data.json"
-    indexed_data = JSON.load file
-    file.close
+    file = File.read "#{Rails.root}/public/data/brand_data_v0.json"
+    parser = Yajl::Parser.new
+    indexed_data = parser.parse(file)
     render :json => indexed_data
   end
 
@@ -119,9 +132,9 @@ class BrandController < ApplicationController
   private
 
   def load_data
-    file = File.open "#{Rails.root}/public/data/brand_data_v0.json"
-    @data = JSON.load file
-    file.close
+    file = File.read "#{Rails.root}/public/data/brand_data_v0.json"
+    parser = Yajl::Parser.new
+    data = parser.parse(file)
   end
 
 
